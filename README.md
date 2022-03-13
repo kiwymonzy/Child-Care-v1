@@ -1,3 +1,3 @@
-# KIWYMONZY - CHILD CARE APP (Expo)
+## CHILD CARE APP (Expo)
 
 
