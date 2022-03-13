@@ -1,75 +1,47 @@
-import * as React from 'react';
-import { Appearance, StatusBar, ImageBackground
- } from 'react-native';
-import { ScreenOrientation } from 'expo';
-import AppLoading from 'expo-app-loading';
-import { device, func } from './src/constants';
+import React from 'react';
+import { createStackNavigator } from "@react-navigation/stack";
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 
-// main navigation stack
-import RootStack from './src/navigation/RootStack';
+import { BookDetail, Settings } from "./screens";
+import Tabs from "./navigation/tabs";
+import { useFonts } from 'expo-font';
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isLoading: true,
-      theme: 'light'
-    };
-
-    // is iPad?
-    if (device.isPad) {
-      ScreenOrientation.allowAsync(
-        ScreenOrientation.Orientation.ALL_BUT_UPSIDE_DOWN
-      );
+const theme = {
+    ...DefaultTheme,
+    colors: {
+        ...DefaultTheme.colors,
+        border: "transparent"
     }
+}
 
-    this.updateTheme = this.updateTheme.bind(this);
-  }
+const Stack = createStackNavigator();
 
-  componentDidMount() {
-    // get system preference
-    const colorScheme = Appearance.getColorScheme();
-    console.log('react-native::Appearance', colorScheme);
+const App = () => {
+    const [loaded] = useFonts({
+            "Roboto-Black" : require('./assets/fonts/Roboto-Black.ttf'),
+            "Roboto-Bold" : require('./assets/fonts/Roboto-Bold.ttf'),
+            "Roboto-Regular" : require('./assets/fonts/Roboto-Regular.ttf'),
+        })
 
-    // if light or dark
-    if (colorScheme !== 'no-preference') {
-      this.setState({
-        theme: colorScheme
-      });
+    if(!loaded){
+        return null;
     }
-  }
-
-  updateTheme(themeType) {
-    this.setState({
-      theme: themeType
-    });
-  }
-
-  render() {
-    const { isLoading, theme } = this.state;
-    const iOSStatusType = theme === 'light' ? 'dark-content' : 'light-content';
-
-    if (isLoading) {
-      return (
-        <AppLoading
-          onError={() => {
-            // console.warn
-          }}
-          onFinish={() => this.setState({ isLoading: false })}
-          startAsync={func.loadAssetsAsync}
-        />
-      );
-    }
-
     return (
-      <React.Fragment>
-        <StatusBar barStyle={device.iOS ? iOSStatusType : 'light-content'} />
+        <NavigationContainer theme={theme}>
+            <Stack.Navigator
+                screenOptions={{
+                    headerShown: false
+                }}
+                initialRouteName={'Home'}
+            >
+                {/* Tabs */}
+                <Stack.Screen name="Home" component={Tabs} />
 
-        <RootStack theme={theme} />
-      </React.Fragment>
-    );
-  }
+                {/* Screens */}
+                <Stack.Screen name="BookDetail" component={BookDetail} options={{ headerShown: false }} />
+            </Stack.Navigator>
+        </NavigationContainer>
+    )
 }
 
 export default App;
